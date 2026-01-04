@@ -1,21 +1,18 @@
+// src/models/User.ts
 import mongoose, { Schema, model, models } from "mongoose";
-import bcrypt from "bcryptjs";
 
-const UserSchema = new Schema(
-  {
-    email: { type: String, required: true, unique: true, lowercase: true },
-    password: { type: String, required: true, select: false },
-    role: { type: String, enum: ["manager", "rep"], default: "rep" },
+const UserSchema = new Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { 
+    type: String, 
+    enum: ["rep", "manager"], 
+    default: "rep" 
   },
-  { timestamps: true }
-);
-
-UserSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
-
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
+  // REMOVE 'required: true' from here, or remove the line entirely
+  companyId: { type: Schema.Types.ObjectId, ref: "Company" }, 
+}, { timestamps: true });
 
 const User = models.User || model("User", UserSchema);
 export default User;
